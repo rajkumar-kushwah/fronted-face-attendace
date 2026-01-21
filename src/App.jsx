@@ -26,7 +26,7 @@ import LeaveMainPage from './leaves/LeaveMainPage';
 import PayrollPage from './payroll/PayrollPage';
 import SecondCounter from './seconds/Second';
 import EditProfile from './profile/EditProfile';
-
+import Pro from './basics/Filternet';
 function App() {
   return (
      <UserProvider>
@@ -59,6 +59,7 @@ function App() {
         <Route path="/leave"  element={<ProtectedRoute><LeaveMainPage /></ProtectedRoute>}/>
         <Route path="/payroll" element={<ProtectedRoute><PayrollPage/></ProtectedRoute>} />
         <Route path='/second' element={<ProtectedRoute><SecondCounter /></ProtectedRoute>}/>
+        <Route path='/game' element={<ProtectedRoute><Pro /></ProtectedRoute>}/>
         {/* protected route end */}
       </Routes>
     </Router>
