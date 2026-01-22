@@ -28,7 +28,12 @@ const Login = () => {
 
     try {
       setLoading(true);
-      const res = await api.post("/auth/login", { ...formData, captchaToken });
+       //  Generate v3 Enterprise token
+    const token = await grecaptcha.enterprise.execute(
+      '6LfhjVIsAAAAAMgs9ImcohxBjVFO2aBleK9Cb0ip', 
+      { action: 'LOGIN' }
+    );
+      const res = await api.post("/auth/login", { ...formData, captchaToken: token });
 
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
@@ -123,13 +128,13 @@ const Login = () => {
               </Link>
             </div>
 
-            <div className="flex justify-center">
+            {/* <div className="flex justify-center">
               <ReCAPTCHA
-                sitekey="6LeHZFIsAAAAACNVjhF5UjxuVx6JbgZMgGsPIbdk"
+                sitekey="6LfhjVIsAAAAAMgs9ImcohxBjVFO2aBleK9Cb0ip"
                 onChange={(token) => setCaptchaToken(token)}
                 onExpired={() => setCaptchaToken(null)}
               />
-            </div>
+            </div> */}
 
             <button
               type="submit"
