@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaEnvelope, FaLock } from "react-icons/fa";
-import ReCAPTCHA from "react-google-recaptcha";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Payroll from "../images/Payroll.png";
@@ -21,18 +20,14 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!captchaToken) {
-      toast.error("Please complete the reCAPTCHA!");
-      return;
-    }
+    // if (!captchaToken) {
+    //   toast.error("Please complete the reCAPTCHA!");
+    //   return;
+    // }
 
     try {
       setLoading(true);
-       //  Generate v3 Enterprise token
-    const token = await grecaptcha.enterprise.execute(
-      '6LfhjVIsAAAAAMgs9ImcohxBjVFO2aBleK9Cb0ip', 
-      { action: 'LOGIN' }
-    );
+     
       const res = await api.post("/auth/login", { ...formData, captchaToken: token });
 
       localStorage.setItem("token", res.data.token);
