@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaEnvelope, FaLock } from "react-icons/fa";
+import ReCAPTCHA from "react-google-recaptcha";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Payroll from "../images/Payroll.png";
@@ -20,15 +21,14 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // if (!captchaToken) {
-    //   toast.error("Please complete the reCAPTCHA!");
-    //   return;
-    // }
+    if (!captchaToken) {
+      toast.error("Please complete the reCAPTCHA!");
+      return;
+    }
 
     try {
       setLoading(true);
-     
-      const res = await api.post("/auth/login", { ...formData, captchaToken: token });
+      const res = await api.post("/auth/login", { ...formData, captchaToken });
 
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
@@ -123,13 +123,13 @@ const Login = () => {
               </Link>
             </div>
 
-            {/* <div className="flex justify-center">
+            <div className="flex justify-center">
               <ReCAPTCHA
-                sitekey="6LfhjVIsAAAAAMgs9ImcohxBjVFO2aBleK9Cb0ip"
+                sitekey="6LdM3wgsAAAAAFO8PiOnKKfZHMbdvUcO16ijYTl3"
                 onChange={(token) => setCaptchaToken(token)}
                 onExpired={() => setCaptchaToken(null)}
               />
-            </div> */}
+            </div>
 
             <button
               type="submit"
