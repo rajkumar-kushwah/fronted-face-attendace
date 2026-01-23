@@ -1,0 +1,69 @@
+import { useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { loadFaceModels, getFaceDescriptor } from "../utils/faceApi";
+
+export default function FaceScan({ setFaceData }) {
+  const videoRef = useRef(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    loadFaceModels();
+    startCamera();
+  }, []);
+
+  const startCamera = async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+    videoRef.current.srcObject = stream;
+  };
+
+  const captureFace = async () => {
+    const descriptor = await getFaceDescriptor(videoRef.current);
+
+    if (!descriptor) {
+      alert("Face not detected");
+      return;
+    }
+
+    //  capture image from camera
+    const canvas = document.createElement("canvas");
+    canvas.width = videoRef.current.videoWidth;
+    canvas.height = videoRef.current.videoHeight;
+    canvas.getContext("2d").drawImage(videoRef.current, 0, 0);
+
+    const imageBlob = await new Promise(res =>
+      canvas.toBlob(res, "image/jpeg")
+    );
+
+    // send back
+    setFaceData({
+      descriptor,
+      image: imageBlob,
+      preview: URL.createObjectURL(imageBlob),
+    });
+
+    navigate(-1);
+  };
+
+  // stopcapture cemra
+    const stopCamera = () => {
+      const stream = videoRef.current.srcObject;
+      const tracks = stream.getTracks();
+      tracks.forEach(track => track.stop());
+      videoRef.current.srcObject = null;
+      navigate(-1);
+
+    }
+
+  return (
+    <div className="p-4">
+      <video ref={videoRef} autoPlay className="rounded w-full" />
+      <button onClick={captureFace} className="btn mt-4 border rounded bg-gray-400 cursor-pointer">
+        Scan & Save
+      </button>
+      <button onClick={stopCamera} className="btn mt-4 border rounded bg-gray-400 cursor-pointer">
+        Stop Camera
+      </button>
+    </div>
+  );
+}
+

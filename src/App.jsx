@@ -27,8 +27,11 @@ import PayrollPage from './payroll/PayrollPage';
 import SecondCounter from './seconds/Second';
 import EditProfile from './profile/EditProfile';
 import Pro from './basics/Filternet';
+import FaceScan from './employees/FaceScan';
+import { FaceProvider } from "./context/FaceContext";
 function App() {
   return (
+    <FaceProvider>
      <UserProvider>
     
     <Router >
@@ -47,6 +50,7 @@ function App() {
         {/* Protected */}
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/employees" element={<ProtectedRoute><Employees /></ProtectedRoute>} />
+        <Route path="/face-scan" element={<FaceProvider> <FaceScan /></FaceProvider>} />
         <Route path="/employee/add" element={<ProtectedRoute> <AddEmployee /></ProtectedRoute>} />
         <Route path="/employee/:employeeId/add-salary/:salaryId?" element={<ProtectedRoute><AddSalary /></ProtectedRoute>} />
         <Route path="/employee/:id" element={<ProtectedRoute><EmployeeDetail /></ProtectedRoute>} />
@@ -65,6 +69,7 @@ function App() {
     </Router>
 
     </UserProvider>
+    </FaceProvider>
   );
 }
 
