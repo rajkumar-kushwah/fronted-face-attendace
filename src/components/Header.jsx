@@ -125,7 +125,7 @@ export default function Header({ toggle, isOpen }) {
             </div>
           )}
         </div>
-              <div className="dark-mode-toggle flex flex-col items-center mr-52 "><DarkModeToggle/></div>
+        <div className="dark-mode-toggle flex flex-col items-center"><DarkModeToggle/></div>
 
       </div>
 
