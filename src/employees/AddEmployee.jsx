@@ -9,55 +9,73 @@ import FaceScan from "./FaceScan";
 export default function EmployeeAdd() {
   const navigate = useNavigate();
 
-  // Employee Fields
+  // Employee fields
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [jobRole, setJobRole] = useState("employee");
   const [department, setDepartment] = useState("");
   const [joinDate, setJoinDate] = useState("");
-  const [dob, setDob] = useState("");  
+  const [dob, setDob] = useState("");
   const [status, setStatus] = useState("active");
   const [basicSalary, setBasicSalary] = useState("");
-  // const [password, setPassword] = useState("");
 
   // Face context
   const { faceData, setFaceData } = useFace();
 
-  // Modal state
+  // Modal
   const [showFaceScan, setShowFaceScan] = useState(false);
 
-  // Handle Add Employee
+  // -------------------------------
+  // ADD EMPLOYEE
+  // -------------------------------
   const handleAdd = async () => {
     if (!name || !email || !department) {
       alert("Name, Email, Department required");
       return;
     }
 
+    if (!faceData?.descriptor || faceData.descriptor.length !== 128) {
+      alert("Please scan face first");
+      return;
+    }
+
     try {
       const formData = new FormData();
+
+      // Normal fields
       formData.append("name", name);
       formData.append("email", email);
       formData.append("phone", phone);
       formData.append("jobRole", jobRole);
       formData.append("department", department);
       formData.append("joinDate", joinDate);
-      formData.append("dob", dob);
+      formData.append("dateOfBirth", dob);
       formData.append("status", status);
       formData.append("basicSalary", basicSalary);
-      formData.append("password", password);
 
-      // Add avatar if scanned
-      if (faceData?.image) {
-        formData.append("avatar", faceData.image);
-      }
+      // Face descriptor (IMPORTANT)
+      formData.append(
+        "faceDescriptor",
+        JSON.stringify(faceData.descriptor)
+      );
+
+      // Face image (IMPORTANT)
+      const file = new File(
+        [faceData.image],
+        "face.jpg",
+        { type: "image/jpeg" }
+      );
+
+      formData.append("faceImage", file);
 
       await addEmployee(formData);
+
       alert("Employee added successfully!");
       navigate("/employees");
     } catch (err) {
-      alert("Employee add failed");
-      console.error(err);
+      console.error("Add Employee Error:", err);
+      alert(err?.response?.data?.message || "Employee add failed");
     }
   };
 
@@ -77,7 +95,7 @@ export default function EmployeeAdd() {
         <div className="flex flex-col items-center mb-5 relative">
           <img
             src={faceData?.preview || "/default-avatar.png"}
-            className="w-12 h-12 rounded-full border object-cover mb-1 cursor-pointer"
+            className="w-14 h-14 rounded-full border object-cover mb-1 cursor-pointer"
             onClick={() => setShowFaceScan(true)}
             title="Click to scan face"
           />
@@ -177,44 +195,36 @@ export default function EmployeeAdd() {
           <div>
             <label className="block mb-1">Basic Salary</label>
             <input
-              className="w-full border rounded px-2 py-1"
               type="number"
+              className="w-full border rounded px-2 py-1"
               value={basicSalary}
               onChange={e => setBasicSalary(e.target.value)}
             />
           </div>
         </div>
 
-        {/* Password */}
-        {/* <div className="mb-3">
-          <label className="block mb-1">Password</label>
-          <input
-            type="password"
-            className="w-full border rounded px-2 py-1"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-          />
-        </div> */}
-
         {/* Submit */}
         <button
           onClick={handleAdd}
-          className="w-full bg-lime-400 cursor-pointer hover:bg-lime-500 text-white py-2 rounded"
+          className="w-full bg-lime-500 hover:bg-lime-600 text-white py-2 rounded"
         >
           Submit
         </button>
 
-        {/* FaceScan Modal */}
+        {/* Face Scan Modal */}
         {showFaceScan && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-4 w-96">
+            <div className="bg-white rounded-lg p-4 w-96 relative">
               <button
                 className="absolute top-2 right-2 text-gray-500 hover:text-black"
                 onClick={() => setShowFaceScan(false)}
               >
                 <X size={18} />
               </button>
-              <FaceScan setFaceData={setFaceData} />
+              <FaceScan
+                onDone={() => setShowFaceScan(false)}
+                setFaceData={setFaceData}
+              />
             </div>
           </div>
         )}

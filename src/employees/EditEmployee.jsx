@@ -1,14 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import { getEmployeeById, updateEmployeeProfile } from "../utils/api";
+import Webcam from "react-webcam";
 
 export default function EditEmployee() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const webcamRef = useRef(null);
 
   const [avatarFile, setAvatarFile] = useState(null);
-  const [avatar, setAvatar] = useState("");
+  const [faceImage, setFaceImage] = useState("");
+  const [capturedImage, setCapturedImage] = useState("");
+  const [useCamera, setUseCamera] = useState(false);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -19,19 +23,23 @@ export default function EditEmployee() {
   const [joinDate, setJoinDate] = useState("");
   const [status, setStatus] = useState("active");
   const [basicSalary, setBasicSalary] = useState("");
-  // const [notes, setNotes] = useState("");
-  const [password, setPassword] = useState("");
- 
 
-
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
 
   // ================= FETCH EMPLOYEE =================
   useEffect(() => {
+    if (!id) return navigate("/employees");
+
     const fetchEmployee = async () => {
       try {
         const res = await getEmployeeById(id);
-        const emp = res.data.emp;
+        console.log("Edit Employee API ", res.data);
+
+        const emp =
+          res.data.employee ||
+          res.data.emp ||
+          res.data.data ||
+          res.data;
 
         setName(emp.name || "");
         setEmail(emp.email || "");
@@ -42,13 +50,13 @@ export default function EditEmployee() {
         setJoinDate(emp.joinDate ? emp.joinDate.split("T")[0] : "");
         setStatus(emp.status || "active");
         setBasicSalary(emp.basicSalary || "");
-        // setNotes(emp.notes || "");
-        setAvatar(emp.avatar || "");
+        setFaceImage(emp.faceImage || "");
       } catch (err) {
+        console.error(err);
         alert("Employee load failed");
         navigate("/employees");
       } finally {
-        setLoading(false);
+        // setLoading(false);
       }
     };
 
@@ -64,25 +72,30 @@ export default function EditEmployee() {
       formData.append("name", name);
       formData.append("email", email);
       formData.append("phone", phone);
-      formData.append("dateOfBirth", dob); //  DOB
+      formData.append("dateOfBirth", dob);
       formData.append("jobRole", jobRole);
       formData.append("department", department);
       formData.append("joinDate", joinDate);
       formData.append("status", status);
       formData.append("basicSalary", basicSalary);
-      // formData.append("notes", notes);
+
       if (password) formData.append("password", password);
 
-
-
+      // Upload file or captured camera image
       if (avatarFile) {
-        formData.append("avatar", avatarFile);
+        formData.append("faceImage", avatarFile);
+      } else if (capturedImage) {
+        const res = await fetch(capturedImage);
+        const blob = await res.blob();
+        formData.append("faceImage", blob, "camera.jpg");
       }
 
       await updateEmployeeProfile(id, formData);
+
       alert("Employee updated successfully!");
       navigate("/employees");
     } catch (err) {
+      console.error(err);
       alert("Update failed");
     }
   };
@@ -97,29 +110,85 @@ export default function EditEmployee() {
 
   return (
     <Layout>
-      <div className="max-w-2xl mx-auto mt-6 border-gray-100 p-5 rounded-lg shadow text-sm">
-
+      <div className="text-left">
         <h2 className="font-semibold mb-4">Edit Employee</h2>
+      </div>
+      <div className="max-w-2xl mx-auto mt-6 p-5 rounded-lg shadow text-sm">
+        <button
+          type="button"
+          onClick={() => navigate("/employees")}
+          className="px-2 py-1 bg-gray-400 cursor-pointer text-white rounded"
+        >
+          Back
+        </button>
 
         <form onSubmit={handleUpdate} className="space-y-3">
-
-          {/* Avatar */}
+          {/* Avatar / Camera */}
           <div className="flex flex-col items-center">
-            <img
-              src={avatarFile ? URL.createObjectURL(avatarFile) : avatar || "/default-avatar.png"}
-              className="w-16 h-16 rounded-full  object-cover border mb-2"
-            />
-            <input
-              type="file"
-              accept="image/*"
-              onChange={e => setAvatarFile(e.target.files[0])}
-              className="text-xs cursor-pointer"
-            />
+            {useCamera ? (
+              <>
+                <Webcam
+                  ref={webcamRef}
+                  audio={false}
+                  screenshotFormat="image/jpeg"
+                  className="w-40 h-40 rounded-full object-cover border mb-2"
+                />
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    className="px-2 py-1 bg-blue-500 cursor-pointer text-white rounded text-xs"
+                    onClick={() => {
+                      const imageSrc = webcamRef.current.getScreenshot();
+                      setCapturedImage(imageSrc);
+                      setUseCamera(false);
+                    }}
+                  >
+                    Capture
+                  </button>
+                  <button
+                    type="button"
+                    className="px-2 py-1 bg-gray-500 cursor-pointer text-white rounded text-xs"
+                    onClick={() => setUseCamera(false)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <img
+                  src={
+                    capturedImage
+                      ? capturedImage
+                      : avatarFile
+                        ? URL.createObjectURL(avatarFile)
+                        : faceImage || "/default-avatar.png"
+                  }
+                  alt="avatar"
+                  className="w-16 h-16 rounded-full object-cover border mb-2"
+                />
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    className="px-2 py-1 bg-blue-500 cursor-pointer text-white rounded text-xs"
+                    onClick={() => setUseCamera(true)}
+                  >
+                    Use Camera
+                  </button>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={e => setAvatarFile(e.target.files[0])}
+                    className="text-xs cursor-pointer"
+                  />
+                </div>
+              </>
+            )}
           </div>
 
           {/* Name */}
           <div>
-            <label className="block  mb-1">Name</label>
+            <label className="block mb-1">Name</label>
             <input
               className="w-full border rounded px-2 py-1"
               value={name}
@@ -137,7 +206,6 @@ export default function EditEmployee() {
                 value={dob}
                 onChange={e => setDob(e.target.value)}
               />
-
             </div>
 
             <div>
@@ -216,47 +284,18 @@ export default function EditEmployee() {
               />
             </div>
           </div>
-          <div className="mb-3">
-  <label className="block mb-1">Password</label>
-  <input
-    type="password"
-    className="w-full border rounded px-2 py-1"
-    value={password}
-    onChange={e => setPassword(e.target.value)}
-  />
-</div>
-
-
-          {/* Notes */}
-
-          {/* <div>
-            <label className="block mb-1">Notes</label>
-            <textarea
-              rows="2"
-              className="w-full border rounded px-3 py-2 resize-none"
-              value={notes}
-              onChange={e => setNotes(e.target.value)}
-            />
-          </div> */}
 
           {/* Buttons */}
           <div className="flex justify-between pt-2">
-            <button
-              type="button"
-              onClick={() => navigate("/employees")}
-              className="px-2 py-1 bg-gray-400 cursor-pointer text-white rounded"
-            >
-              Cancel
-            </button>
+
 
             <button
               type="submit"
-              className="px-2 py-1 bg-lime-400 cursor-pointer text-white rounded hover:bg-lime-500"
+              className="px-2 py-1 w-full cursor-pointer text-gray-700 bg-gray-200 rounded-2xl hover:bg-gray-300  rounde"
             >
               Update
             </button>
           </div>
-
         </form>
       </div>
     </Layout>

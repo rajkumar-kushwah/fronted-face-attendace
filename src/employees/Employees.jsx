@@ -37,15 +37,15 @@ export default function Employees() {
   useEffect(() => { fetchEmployees(); }, []);
 
   // Delete Employee
-  const handleDelete = async (id) => {
-    if (!window.confirm("Delete this employee?")) return;
-    try {
-      await deleteEmployee(id);
-      fetchEmployees();
-    } catch (err) {
-      alert("Delete failed");
-    }
-  };
+  // const handleDelete = async (id) => {
+  //   if (!window.confirm("Delete this employee?")) return;
+  //   try {
+  //     await deleteEmployee(id);
+  //     fetchEmployees();
+  //   } catch (err) {
+  //     alert("Delete failed");
+  //   }
+  // };
 
   // Filter Employees
   const filteredEmployees = employees.filter(emp =>
@@ -123,8 +123,8 @@ export default function Employees() {
       {filteredEmployees.map(emp => (
         <tr key={emp._id} className="hover:bg-gray-50 border text-xs  border-gray-300">
           <td className="px-3 py-2 whitespace-nowrap border-r border-gray-300">{emp.employeeCode}</td>
-          <td className="px-3 py-2 flex items-center gap-2 whitespace-nowrap border-r border-gray-300">
-            <img src={emp.avatar || "/default-avatar.png"} alt="avatar" className="w-5 h-5 rounded-full object-cover" />
+          <td className="px-3 py-2 flex items-center gap-2 whitespace-nowrap border-r overflow-hidden truncate border-gray-300">
+            <img src={emp.faceImage || "/default-avatar.png"} alt="faceImage" className="w-5 h-5 rounded-full object-cover " />
             {emp.name}
           </td>
           <td className="px-3 py-2 whitespace-nowrap border-r border-gray-300">{emp.email}</td>
@@ -139,9 +139,11 @@ export default function Employees() {
 
           
           <td className="px-3 py-2 flex justify-center items-center gap-1 whitespace-nowrap">
-            <Eye size={12} className="cursor-pointer text-blue-500" onClick={() => navigate(`/employee/${emp._id}`)} />
-            <Pencil size={12} className="cursor-pointer text-yellow-500" onClick={() => navigate(`/employee/${emp._id}/edit`)} />
-            <Trash2 size={12} className="cursor-pointer text-red-500" onClick={() => handleDelete(emp._id)} />
+           <button onClick={() => navigate(`/employee/${emp._id}`)} className=" border text-gray-800 hover:gray-300 px-2 py-1 cursor-pointer rounded text-xs">View</button>
+
+            {/* <Eye size={12} className="cursor-pointer text-blue-500" onClick={() => navigate(`/employee/${emp._id}`)} /> */}
+            {/* <Pencil size={12} className="cursor-pointer text-yellow-500" onClick={() => navigate(`/employee/${emp._id}/edit`)} />
+            <Trash2 size={12} className="cursor-pointer text-red-500" onClick={() => handleDelete(emp._id)} /> */}
           </td>
         </tr>
       ))}

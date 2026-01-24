@@ -16,33 +16,38 @@ export default function FaceScan({ setFaceData }) {
     videoRef.current.srcObject = stream;
   };
 
-  const captureFace = async () => {
-    const descriptor = await getFaceDescriptor(videoRef.current);
+ const captureFace = async () => {
+  const rawDescriptor = await getFaceDescriptor(videoRef.current);
 
-    if (!descriptor) {
-      alert("Face not detected");
-      return;
-    }
+  if (!rawDescriptor) {
+    alert("Face not detected");
+    return;
+  }
 
-    //  capture image from camera
-    const canvas = document.createElement("canvas");
-    canvas.width = videoRef.current.videoWidth;
-    canvas.height = videoRef.current.videoHeight;
-    canvas.getContext("2d").drawImage(videoRef.current, 0, 0);
+  const descriptor = Array.from(rawDescriptor);
 
-    const imageBlob = await new Promise(res =>
-      canvas.toBlob(res, "image/jpeg")
-    );
+  const canvas = document.createElement("canvas");
+  canvas.width = videoRef.current.videoWidth;
+  canvas.height = videoRef.current.videoHeight;
+  canvas.getContext("2d").drawImage(videoRef.current, 0, 0);
 
-    // send back
-    setFaceData({
-      descriptor,
-      image: imageBlob,
-      preview: URL.createObjectURL(imageBlob),
-    });
+  const imageBlob = await new Promise(res =>
+    canvas.toBlob(res, "image/jpeg")
+  );
 
-    navigate(-1);
-  };
+  // stop camera
+  const stream = videoRef.current.srcObject;
+  stream.getTracks().forEach(t => t.stop());
+  videoRef.current.srcObject = null;
+
+  setFaceData({
+    descriptor,
+    image: imageBlob,
+    preview: URL.createObjectURL(imageBlob),
+  });
+
+  navigate(-1);
+};
 
   // stopcapture cemra
     const stopCamera = () => {
