@@ -1,36 +1,72 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { getProfile, getOfficeHolidaysApi } from "../utils/api";
-import { getPayrolls } from "../utils/api";
-
+import { getProfile, getOfficeHolidaysApi, getPayrolls } from "../utils/api";
 
 const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
+  // user
   const [user, setUser] = useState(() => {
     const stored = localStorage.getItem("user");
     return stored ? JSON.parse(stored) : null;
   });
-
   const [loading, setLoading] = useState(!user);
 
-  //  OFFICE HOLIDAY CACHE (GLOBAL)
-  const [officeHolidays, setOfficeHolidays] = useState([]);
-  const [holidayLoaded, setHolidayLoaded] = useState(false);
+  // office holidays
+  const [officeHolidays, setOfficeHolidays] = useState(() => {
+    const stored = localStorage.getItem("officeHolidays");
+    return stored ? JSON.parse(stored) : [];
+  });
+  const [holidayLoaded, setHolidayLoaded] = useState(!!officeHolidays.length);
 
-  // Global payroll cache
-  const [payrolls, setPayrolls] = useState([]);
-  const [payrollLoaded, setPayrollLoaded] = useState(false);
+  // payrolls
+  const [payrolls, setPayrolls] = useState(() => {
+    const stored = localStorage.getItem("payrolls");
+    return stored ? JSON.parse(stored) : [];
+  });
+  const [payrollLoaded, setPayrollLoaded] = useState(!!payrolls.length);
 
+  // employees
+  const [employees, setEmployees] = useState(() => {
+    const stored = localStorage.getItem("employees");
+    return stored ? JSON.parse(stored) : [];
+  });
 
+  // save user
   const updateUser = (data) => {
     setUser(data);
     localStorage.setItem("user", JSON.stringify(data));
   };
 
+  // save officeHolidays
+  useEffect(() => {
+    localStorage.setItem("officeHolidays", JSON.stringify(officeHolidays));
+  }, [officeHolidays]);
+
+  // save payrolls
+  useEffect(() => {
+    localStorage.setItem("payrolls", JSON.stringify(payrolls));
+  }, [payrolls]);
+
+  // save employees
+  useEffect(() => {
+    localStorage.setItem("employees", JSON.stringify(employees));
+  }, [employees]);
+
+  // add a new employee
+  const addEmployeeLocal = (newEmp) => {
+    setEmployees(prev => [...prev, newEmp]);
+  };
+
   const logout = () => {
     setUser(null);
-    localStorage.removeItem("user");
+    setOfficeHolidays([]);
+    setPayrolls([]);
+    setEmployees([]);
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("officeHolidays");
+    localStorage.removeItem("payrolls");
+    localStorage.removeItem("employees");
     window.location.href = "/login";
   };
 
@@ -42,24 +78,14 @@ export const UserProvider = ({ children }) => {
         setLoading(false);
         return;
       }
-
-
-      // if (!user) setLoading(true);
       setLoading(true);
       try {
         const res = await getProfile();
-        if (res.data) {
-          updateUser(res.data);
-        }
+        if (res.data) updateUser(res.data);
+        
       } catch (err) {
-        //  sirf token invalid ho tab logout
         if (err.response && (err.response.status === 401 || err.response.status === 403)) {
-          localStorage.removeItem("token");
-          localStorage.removeItem("user");
-          setUser(null);
-        } else {
-          // network / server issue
-          console.log("Network issue, user not logged out");
+          logout();
         }
       } finally {
         setLoading(false);
@@ -68,20 +94,18 @@ export const UserProvider = ({ children }) => {
     fetchUser();
   }, []);
 
-  // 🔹 OFFICE HOLIDAY FETCH (ONLY ONCE)
+  // 🔹 OFFICE HOLIDAY FETCH
   useEffect(() => {
     const fetchOfficeHolidays = async () => {
       if (!user || user.role === "employee" || holidayLoaded) return;
-
       try {
         const res = await getOfficeHolidaysApi();
-        setOfficeHolidays(res.data.data);
-        setHolidayLoaded(true); //  cache flag
+        if (res.data?.data) setOfficeHolidays(res.data.data);
+        setHolidayLoaded(true);
       } catch (err) {
         console.error("Office holiday fetch failed", err);
       }
     };
-
     fetchOfficeHolidays();
   }, [user, holidayLoaded]);
 
@@ -89,22 +113,18 @@ export const UserProvider = ({ children }) => {
   useEffect(() => {
     const fetchPayrolls = async () => {
       if (!user || payrollLoaded) return;
-
       try {
-        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
         const currentDate = new Date();
         const month = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
 
         const res = await getPayrolls({ month });
-        if (res.data && Array.isArray(res.data.data)) {
-          setPayrolls(res.data.data);
-        }
+        if (res.data && Array.isArray(res.data.data)) setPayrolls(res.data.data);
         setPayrollLoaded(true);
       } catch (err) {
         console.error("Payroll fetch failed", err);
       }
     };
-
     fetchPayrolls();
   }, [user, payrollLoaded]);
 
@@ -115,14 +135,13 @@ export const UserProvider = ({ children }) => {
         setUser: updateUser,
         logout,
         loading,
-
-        //  expose holidays
         officeHolidays,
         setOfficeHolidays,
-
-        // payroll
         payrolls,
         setPayrolls,
+        employees,
+        setEmployees,
+        addEmployeeLocal, //  use this to save a new employee
       }}
     >
       {children}

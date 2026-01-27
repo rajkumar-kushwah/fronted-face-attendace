@@ -5,9 +5,11 @@ import { addEmployee } from "../utils/api";
 import { X, Camera } from "lucide-react";
 import { useFace } from "../context/FaceContext";
 import FaceScan from "./FaceScan";
+import { useUser } from "../context/UserContext";
 
 export default function EmployeeAdd() {
   const navigate = useNavigate();
+  const { addEmployeeLocal } = useUser();
 
   // Employee fields
   const [name, setName] = useState("");
@@ -29,67 +31,65 @@ export default function EmployeeAdd() {
   // -------------------------------
   // ADD EMPLOYEE
   // -------------------------------
-  const handleAdd = async () => {
-    if (!name || !email || !department) {
-      alert("Name, Email, Department required");
-      return;
-    }
+const handleAdd = async () => {
+  if (!name || !email || !department) {
+    alert("Name, Email, Department required");
+    return;
+  }
 
-    if (!faceData?.descriptor || faceData.descriptor.length !== 128) {
-      alert("Please scan face first");
-      return;
-    }
+  if (!faceData?.descriptor || faceData.descriptor.length !== 128) {
+    alert("Please scan face first");
+    return;
+  }
 
-    try {
-      const formData = new FormData();
+  try {
+    const formData = new FormData();
 
-      // Normal fields
-      formData.append("name", name);
-      formData.append("email", email);
-      formData.append("phone", phone);
-      formData.append("jobRole", jobRole);
-      formData.append("department", department);
-      formData.append("joinDate", joinDate);
-      formData.append("dateOfBirth", dob);
-      formData.append("status", status);
-      formData.append("basicSalary", basicSalary);
+    // Normal fields
+    formData.append("name", name);
+    formData.append("email", email);
+    formData.append("phone", phone);
+    formData.append("jobRole", jobRole);
+    formData.append("department", department);
+    formData.append("joinDate", joinDate);
+    formData.append("dateOfBirth", dob);
+    formData.append("status", status);
+    formData.append("basicSalary", basicSalary);
 
-      // Face descriptor (IMPORTANT)
-      formData.append(
-        "faceDescriptor",
-        JSON.stringify(faceData.descriptor)
-      );
+    // Face descriptor
+    formData.append("faceDescriptor", JSON.stringify(faceData.descriptor));
 
-      // Face image (IMPORTANT)
-      const file = new File(
-        [faceData.image],
-        "face.jpg",
-        { type: "image/jpeg" }
-      );
+    // Face image
+    const file = new File([faceData.image], "face.jpg", { type: "image/jpeg" });
+    formData.append("faceImage", file);
 
-      formData.append("faceImage", file);
+    // --- CALL API ---
+    const response = await addEmployee(formData); //  save in DB
+    const newEmployee = response.data.employee;
 
-      await addEmployee(formData);
+    // --- SAVE IN LOCAL STORAGE ---
+    addEmployeeLocal(newEmployee); //  now stored in localStorage
 
-      alert("Employee added successfully!");
-      navigate("/employees");
-    } catch (err) {
-      console.error("Add Employee Error:", err);
-      alert(err?.response?.data?.message || "Employee add failed");
-    }
-  };
+    alert("Employee added successfully!");
+    navigate("/employees");
+  } catch (err) {
+    console.error("Add Employee Error:", err);
+    alert(err?.response?.data?.message || "Employee add failed");
+  }
+};
+
 
   return (
     <Layout>
       <div className="max-w-lg mx-auto mt-8 bg-white rounded-lg shadow p-5 relative text-sm">
 
         {/* Close */}
-        <button
-          onClick={() => navigate("/employees")}
-          className="absolute top-2 right-2 cursor-pointer text-gray-500 hover:text-black"
-        >
-          <X size={18} />
-        </button>
+          <button
+            onClick={() => navigate("/employees")}
+            className="absolute top-2 right-2 cursor-pointer text-gray-500 hover:text-black"
+          >
+            <X size={18} />
+          </button>
 
         {/* Avatar */}
         <div className="flex flex-col items-center mb-5 relative">
@@ -100,7 +100,7 @@ export default function EmployeeAdd() {
             title="Click to scan face"
           />
           <Camera
-            className="absolute bottom-0 right-0 cursor-pointer text-gray-600 hover:text-black"
+            className="absolute bottom-0 left-0 top-0 cursor-pointer text-gray-600 hover:text-black"
             size={18}
             onClick={() => setShowFaceScan(true)}
           />

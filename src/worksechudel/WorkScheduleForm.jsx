@@ -78,7 +78,7 @@ export default function WorkScheduleForm({ selectedSchedule, onSubmit, onClose }
     onSubmit({
       employeeId,
       employeeName: selectedEmployee?.name || "",
-      employeeAvatar: selectedEmployee?.avatar || "/default-avatar.png",
+      employeeAvatar: selectedEmployee?.faceImage || "/default-avatar.png",
       inTime,
       outTime,
       shiftName,
@@ -129,7 +129,7 @@ export default function WorkScheduleForm({ selectedSchedule, onSubmit, onClose }
                     className="p-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2"
                     onClick={() => { setEmployeeId(emp._id); setSearchTerm(emp.name); setDropdownOpen(false); }}
                   >
-                    <img src={emp.avatar || "/default-avatar.png"} className="w-5 h-5 rounded-full" />
+                    <img src={emp.faceImage|| "/default-avatar.png"} className="w-5 h-5 rounded-full" />
                     <span>{emp.name} ({emp.employeeCode})</span>
                   </li>
                 ))}

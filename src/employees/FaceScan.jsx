@@ -46,7 +46,8 @@ export default function FaceScan({ setFaceData }) {
     preview: URL.createObjectURL(imageBlob),
   });
 
-  navigate(-1);
+ navigate("/employee/add");
+
 };
 
   // stopcapture cemra
@@ -60,8 +61,8 @@ export default function FaceScan({ setFaceData }) {
     }
 
   return (
-    <div className="p-4">
-      <video ref={videoRef} autoPlay className="rounded w-full" />
+    <div className="flex flex-col w-64 h-64 mx-auto mt-5">
+      <video ref={videoRef} autoPlay className="w-64 h-64 rounded-full object-cover mx-auto" />
       <button onClick={captureFace} className="btn mt-4 border rounded bg-gray-400 cursor-pointer">
         Scan & Save
       </button>

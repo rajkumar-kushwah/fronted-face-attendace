@@ -15,7 +15,7 @@ export default function Employees() {
 
   // Fetch Employees
   const fetchEmployees = async () => {
-  if(employees.length === 0) setLoading(true);
+    if (employees.length === 0) setLoading(true);
     try {
       const res = await getEmployees();
       const empArray = res.employees || [];
@@ -72,7 +72,7 @@ export default function Employees() {
         </div>
 
         {/* Search + Add Button */}
-        
+
       </div>
 
       {/* ===== STATS CARDS ===== */}
@@ -89,67 +89,74 @@ export default function Employees() {
       </div>
 
       <div className="flex sm:flex-row justify-end items-center gap-2 sm:gap-1 ml-auto">
-          <div className="relative">
-            <FaSearch className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
-            <input
-              type="text"
-              placeholder="Search..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              className="pl-7 pr-2 border rounded p-1 text-xs"
-            />
-          </div>
-
-          <button
-            className="flex items-center gap-1 bg-lime-400 text-white px-2 py-1 rounded text-xs"
-            onClick={() => navigate("/employee/add")}
-          >
-            <FaPlus className="sm:hidden" />
-            <span className="hidden sm:inline cursor-pointer text-xs">+ Create</span>
-          </button>
+        <div className="relative">
+          <FaSearch className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
+          <input
+            type="text"
+            placeholder="Search..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="pl-7 pr-2 border rounded p-1 text-xs"
+          />
         </div>
- 
+
+        <button
+          className="flex items-center gap-1 bg-lime-400 text-white px-2 py-1 rounded text-xs"
+          onClick={() => navigate("/employee/add")}
+        >
+          <FaPlus className="sm:hidden" />
+          <span className="hidden sm:inline cursor-pointer text-xs">+ Create</span>
+        </button>
+      </div>
+
       {/* ===== EMPLOYEES TABLE ===== */}
-    <div className="overflow-x-auto w-full mt-2">
-  <table className="w-full min-w-[900px] border-collapse text-left border-r border-gray-300">
-    <thead className="bg-gray-200 sticky top-0 z-10 border border-gray-300">
-      <tr>
-        {["ID","Name","Email","Phone","DOB","Role","Dept","Status","Join","BasicSalary","Actions"].map(h => (
-          <th key={h} className="px-3 py-2 border-b border-r border-gray-300 text-left text-xs whitespace-nowrap">{h}</th>
-        ))}
-      </tr>
-    </thead>
-    <tbody>
-      {filteredEmployees.map(emp => (
-        <tr key={emp._id} className="hover:bg-gray-50 border text-xs  border-gray-300">
-          <td className="px-3 py-2 whitespace-nowrap border-r border-gray-300">{emp.employeeCode}</td>
-          <td className="px-3 py-2 flex items-center gap-2 whitespace-nowrap border-r overflow-hidden truncate border-gray-300">
-            <img src={emp.faceImage || "/default-avatar.png"} alt="faceImage" className="w-5 h-5 rounded-full object-cover " />
-            {emp.name}
-          </td>
-          <td className="px-3 py-2 whitespace-nowrap border-r border-gray-300">{emp.email}</td>
-          <td className="px-3 py-2 whitespace-nowrap border-r border-gray-300">{emp.phone || "-"}</td>
-          <td className="px-3 py-2 whitespace-nowrap border-r border-gray-300">{emp.dateOfBirth ? new Date(emp.dateOfBirth).toLocaleDateString() : "-"}</td>
-          <td className="px-3 py-2 whitespace-nowrap border-r border-gray-300">{emp.jobRole}</td>
-          <td className="px-3 py-2 whitespace-nowrap border-r border-gray-300">{emp.department}</td>
-          <td className="px-3 py-2 whitespace-nowrap border-r border-gray-300">{emp.status}</td>
-          <td className="px-3 py-2 whitespace-nowrap border-r border-gray-300">{emp.joinDate ? new Date(emp.joinDate).toLocaleDateString() : "-"}</td>
-          <td className="px-3 py-2 whitespace-nowrap border-r border-gray-300">{emp.basicSalary || "-"}</td>
-          {/* <td className="px-3 py-2 whitespace-nowrap">{emp.notes || "-"}</td> */}
+      <div className="overflow-x-auto w-full mt-2">
+        <table className="w-full min-w-[900px] border-collapse text-left border-r border-gray-300">
+          <thead className="bg-gray-200 sticky top-0 z-10 border border-gray-300">
+            <tr>
+              {["ID", "Name", "Email", "Phone", "DOB", "Role", "Dept", "Status", "Join", "BasicSalary", "Actions"].map(h => (
+                <th key={h} className="px-3 py-2 border-b border-r border-gray-300 text-left text-xs whitespace-nowrap">{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {filteredEmployees.map(emp => (
+              <tr key={emp._id} className="hover:bg-gray-50 border text-xs  border-gray-300">
+                <td className="px-3 py-2 whitespace-nowrap border-r border-gray-300">{emp.employeeCode}</td>
+                <td className="px-3 py-2 whitespace-nowrap border-r border-gray-300">
+                  <div className="flex items-center gap-2 overflow-hidden">
+                    <img
+                      src={emp.faceImage || "/default-avatar.png"}
+                      alt="faceImage"
+                      className="w-5 h-5 rounded-full object-cover flex-shrink-0"
+                    />
+                    <span className="truncate max-w-[120px]">{emp.name}</span>
+                  </div>
+                </td>
 
-          
-          <td className="px-3 py-2 flex justify-center items-center gap-1 whitespace-nowrap">
-           <button onClick={() => navigate(`/employee/${emp._id}`)} className=" border text-gray-800 hover:gray-300 px-2 py-1 cursor-pointer rounded text-xs">View</button>
+                <td className="px-3 py-2 whitespace-nowrap border-r border-gray-300">{emp.email}</td>
+                <td className="px-3 py-2 whitespace-nowrap border-r border-gray-300">{emp.phone || "-"}</td>
+                <td className="px-3 py-2 whitespace-nowrap border-r border-gray-300">{emp.dateOfBirth ? new Date(emp.dateOfBirth).toLocaleDateString() : "-"}</td>
+                <td className="px-3 py-2 whitespace-nowrap border-r border-gray-300">{emp.jobRole}</td>
+                <td className="px-3 py-2 whitespace-nowrap border-r border-gray-300">{emp.department}</td>
+                <td className="px-3 py-2 whitespace-nowrap border-r border-gray-300">{emp.status}</td>
+                <td className="px-3 py-2 whitespace-nowrap border-r border-gray-300">{emp.joinDate ? new Date(emp.joinDate).toLocaleDateString() : "-"}</td>
+                <td className="px-3 py-2 whitespace-nowrap border-r border-gray-300">{emp.basicSalary || "-"}</td>
+                {/* <td className="px-3 py-2 whitespace-nowrap">{emp.notes || "-"}</td> */}
 
-            {/* <Eye size={12} className="cursor-pointer text-blue-500" onClick={() => navigate(`/employee/${emp._id}`)} /> */}
-            {/* <Pencil size={12} className="cursor-pointer text-yellow-500" onClick={() => navigate(`/employee/${emp._id}/edit`)} />
+
+                <td className="px-3 py-2 flex justify-center items-center gap-1 whitespace-nowrap">
+                  <button onClick={() => navigate(`/employee/${emp._id}`)} className=" border text-gray-800 hover:gray-300 px-2 py-1 cursor-pointer rounded text-xs">View</button>
+
+                  {/* <Eye size={12} className="cursor-pointer text-blue-500" onClick={() => navigate(`/employee/${emp._id}`)} /> */}
+                  {/* <Pencil size={12} className="cursor-pointer text-yellow-500" onClick={() => navigate(`/employee/${emp._id}/edit`)} />
             <Trash2 size={12} className="cursor-pointer text-red-500" onClick={() => handleDelete(emp._id)} /> */}
-          </td>
-        </tr>
-      ))}
-    </tbody>
-  </table>
-</div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
     </Layout>
   );
