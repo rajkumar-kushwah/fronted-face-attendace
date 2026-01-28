@@ -138,6 +138,16 @@ export default function Sidebar({ isOpen, toggle }) {
           </NavLink>
 
           <NavLink
+            to="/attendance-scan"
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition ${isActive(
+              "/attendance-scan"
+            )}`}
+          >
+            <ClipboardList className="w-4 h-4" />
+            <span>face Attendance</span>
+          </NavLink>
+
+          <NavLink
             to="/leave"
             className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition ${isActive(
               "/leave"

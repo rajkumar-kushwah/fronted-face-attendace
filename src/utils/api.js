@@ -171,6 +171,16 @@ export const deleteAttendance = async (id) => {
   return res.data;
 };
 
+// -----------------------------
+// ATTENDANCE – FACE SCAN
+// -----------------------------
+export const faceScanAttendance = async (imageBase64) => {
+  const res = await api.post("/attendance/face-scan", {
+    image: imageBase64,
+  });
+  return res.data;
+};
+
 // leave APIs
 // Client
 export const applyLeaveApi = (data) => api.post("/leaves", data);
