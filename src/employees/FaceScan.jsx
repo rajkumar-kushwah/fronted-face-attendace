@@ -61,12 +61,12 @@ export default function FaceScan({ setFaceData }) {
     }
 
   return (
-    <div className="flex flex-col w-64 h-64 mx-auto mt-5">
+    <div className=" w-64 h-64 mx-auto mt-5">
       <video ref={videoRef} autoPlay className="w-64 h-64 rounded-full object-cover mx-auto" />
-      <button onClick={captureFace} className="btn mt-4 border rounded bg-gray-400 cursor-pointer">
+      <button onClick={captureFace} className="btn mt-4 px-2 py-1 border rounded bg-gray-400 hover:bg-gray-300 cursor-pointer">
         Scan & Save
       </button>
-      <button onClick={stopCamera} className="btn mt-4 border rounded bg-gray-400 cursor-pointer">
+      <button onClick={stopCamera} className="btn mt-4 px-2 py-1 border rounded bg-gray-400  hover:bg-gray-300 cursor-pointer">
         Stop Camera
       </button>
     </div>

@@ -145,4 +145,6 @@ html.dark label{
   color: #c9cccf !important;
 }
 
-
+html.dark button{
+  color: #c9cccf !important;
+}

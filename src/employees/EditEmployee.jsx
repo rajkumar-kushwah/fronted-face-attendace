@@ -79,7 +79,7 @@ export default function EditEmployee() {
       formData.append("status", status);
       formData.append("basicSalary", basicSalary);
 
-      if (password) formData.append("password", password);
+      // if (password) formData.append("password", password);
 
       // Upload file or captured camera image
       if (avatarFile) {
@@ -291,7 +291,7 @@ export default function EditEmployee() {
 
             <button
               type="submit"
-              className="px-2 py-1 w-full cursor-pointer text-gray-700 bg-gray-200 rounded-2xl hover:bg-gray-300  rounde"
+              className="px-2 py-1 w-full cursor-pointer border bg-gray-300 rounded-2xl hover:bg-gray-200  rounde"
             >
               Update
             </button>
