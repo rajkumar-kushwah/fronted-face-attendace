@@ -70,6 +70,8 @@ const handleAdd = async () => {
     // --- SAVE IN LOCAL STORAGE ---
     addEmployeeLocal(newEmployee); //  now stored in localStorage
 
+    setFaceData(null);
+
     alert("Employee added successfully!");
     navigate("/employees");
   } catch (err) {

@@ -6,10 +6,14 @@ export default function FaceScan({ setFaceData }) {
   const videoRef = useRef(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    loadFaceModels();
-    startCamera();
-  }, []);
+ useEffect(() => {
+  const init = async () => {
+    await loadFaceModels(); 
+    await startCamera();
+  };
+  init();
+}, []);
+
 
   const startCamera = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ video: true });
