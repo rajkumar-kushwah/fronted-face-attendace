@@ -6,77 +6,101 @@ import Layout from "../components/Layout";
 
 export default function AttendanceScan() {
   const [employee, setEmployee] = useState(null);
-  const [status, setStatus] = useState(null); // null | IN
   const [isLoading, setIsLoading] = useState(false); // verification / punch animation
   const [cameraKey, setCameraKey] = useState(Date.now()); // reset camera
   const [successMessage, setSuccessMessage] = useState("");
 
-  // Punch In → camera capture
-  const handlePunchInCapture = async (imageBase64) => {
+  // Face scan → decide Punch OUT button
+  const handleFaceDetected = async (imageBase64) => {
     if (isLoading) return;
     setIsLoading(true);
 
     try {
-      // 1️⃣ Verify face
       const res = await verifyFaceApi({
         companyId: "6972164941d0a468448c5f2c",
         image: imageBase64
       });
 
       const emp = res.data.employee;
-      setEmployee(emp);
+      const attendanceStatus = res.data.attendanceStatus; // NOT_PUNCHED | IN | OUT
 
-      // 2️⃣ Punch In
+      setEmployee({ ...emp, attendanceStatus });
+
+      if (attendanceStatus === "IN") {
+        setSuccessMessage("Employee already Punched IN. Ready to Punch OUT.");
+      } else if (attendanceStatus === "OUT") {
+        setSuccessMessage("✅ Employee already Punched OUT today");
+      } else {
+        setSuccessMessage(""); // Punch IN button will be shown
+      }
+
+    } catch (err) {
+      alert("Face not matched / Failed");
+      setEmployee(null);
+      console.error(err);
+    } finally {
+      // short delay just to reset camera
+      setTimeout(() => {
+        setCameraKey(Date.now());
+        setIsLoading(false);
+      }, 1000);
+    }
+  };
+
+  // Manual Punch IN
+  const handlePunchIn = async () => {
+    if (!employee || isLoading) return;
+    setIsLoading(true);
+
+    try {
       await punchInApi({
         companyId: "6972164941d0a468448c5f2c",
-        employeeId: emp.id,
+        employeeId: employee.id,
         location: "Connaught Place, Delhi"
       });
 
-      setStatus("IN");
+      setEmployee((prev) => ({ ...prev, attendanceStatus: "IN" }));
       setSuccessMessage("✅ Punch IN Successful");
 
-      // 3️⃣ Auto clear after 3 seconds
+      // Clear after 3 seconds
       setTimeout(() => {
         setEmployee(null);
-        setStatus(null);
         setSuccessMessage("");
-        setCameraKey(Date.now()); // reset camera
-        setIsLoading(false);
+        setCameraKey(Date.now());
       }, 3000);
 
     } catch (err) {
-      alert("Face not matched / Punch In failed");
-      console.error(err);
+      alert("Punch IN failed");
+    } finally {
       setIsLoading(false);
     }
   };
 
-  // Punch Out
+  // Punch OUT
   const handlePunchOut = async () => {
-    if (!employee) return;
+    if (!employee || isLoading) return;
     setIsLoading(true);
 
     try {
       await punchOutApi({
         companyId: "6972164941d0a468448c5f2c",
-        employeeId: employee._id,
+        employeeId: employee.id,
         location: "Connaught Place, Delhi"
       });
 
+      setEmployee((prev) => ({ ...prev, attendanceStatus: "OUT" }));
       setSuccessMessage("✅ Punch OUT Successful");
 
-      // Auto clear after 3 seconds
+      // Clear after 3 seconds
       setTimeout(() => {
         setEmployee(null);
-        setStatus(null);
         setSuccessMessage("");
-        setCameraKey(Date.now()); // reset camera for next employee
-        setIsLoading(false);
+        setCameraKey(Date.now());
       }, 3000);
 
     } catch (err) {
-      alert("Punch Out failed");
+      alert("Punch OUT failed");
+    } finally {
       setIsLoading(false);
     }
   };
@@ -87,26 +111,37 @@ export default function AttendanceScan() {
 
         {/* Camera */}
         <FaceCamera
-          key={cameraKey} // reset camera for next employee
-          onCapture={handlePunchInCapture}
-          disabled={isLoading || status === "IN"} 
+          key={cameraKey}
+          onCapture={handleFaceDetected}
+          disabled={isLoading}
         />
 
-        {/* Live Employee Preview */}
+        {/* Employee Preview */}
         <EmployeePreview employee={employee} />
 
-        {/* Punch Out */}
-        {employee && status === "IN" && (
+        {/* Punch IN button */}
+        {employee && employee.attendanceStatus === "NOT_PUNCHED" && (
+          <button
+            onClick={handlePunchIn}
+            disabled={isLoading}
+            className="mt-4 w-full bg-green-600 text-white py-2 rounded"
+          >
+            PUNCH IN
+          </button>
+        )}
+
+        {/* Punch OUT button */}
+        {employee && employee.attendanceStatus === "IN" && (
           <button
             onClick={handlePunchOut}
-            className="mt-4 w-full bg-red-600 text-white py-2 rounded"
             disabled={isLoading}
+            className="mt-4 w-full bg-red-600 text-white py-2 rounded"
           >
             PUNCH OUT
           </button>
         )}
 
-        {/* Success / Verification Animation */}
+        {/* Spinning verification animation */}
         {isLoading && (
           <div className="mt-4 text-center">
             <div className="inline-block w-10 h-10 border-4 border-blue-400 border-dashed rounded-full animate-spin"></div>
@@ -116,9 +151,9 @@ export default function AttendanceScan() {
           </div>
         )}
 
-        {/* Success Message (after punch completed) */}
+        {/* Success message after punch completed */}
         {!isLoading && successMessage && (
-          <p className="mt-4 text-center text-green-600 font-bold">
+          <p className="mt-4 text-center font-bold text-green-600">
             {successMessage}
           </p>
         )}
