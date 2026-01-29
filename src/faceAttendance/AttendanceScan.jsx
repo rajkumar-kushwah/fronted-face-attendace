@@ -29,7 +29,7 @@ export default function AttendanceScan() {
       if (attendanceStatus === "IN") {
         setSuccessMessage("Employee already Punched IN. Ready to Punch OUT.");
       } else if (attendanceStatus === "OUT") {
-        setSuccessMessage("✅ Employee already Punched OUT today");
+        setSuccessMessage(" Employee already Punched OUT today");
       } else {
         setSuccessMessage(""); // Punch IN button will be shown
       }
@@ -60,7 +60,7 @@ export default function AttendanceScan() {
       });
 
       setEmployee((prev) => ({ ...prev, attendanceStatus: "IN" }));
-      setSuccessMessage("✅ Punch IN Successful");
+      setSuccessMessage(" Punch IN Successful");
 
       // Clear after 3 seconds
       setTimeout(() => {
@@ -89,7 +89,7 @@ export default function AttendanceScan() {
       });
 
       setEmployee((prev) => ({ ...prev, attendanceStatus: "OUT" }));
-      setSuccessMessage("✅ Punch OUT Successful");
+      setSuccessMessage(" Punch OUT Successful");
 
       // Clear after 3 seconds
       setTimeout(() => {
@@ -124,7 +124,7 @@ export default function AttendanceScan() {
           <button
             onClick={handlePunchIn}
             disabled={isLoading}
-            className="mt-4 w-full bg-green-600 text-white py-2 rounded"
+            className="mt-4 w-full cursor-pointer bg-green-600 text-white py-2 rounded"
           >
             PUNCH IN
           </button>
@@ -135,7 +135,7 @@ export default function AttendanceScan() {
           <button
             onClick={handlePunchOut}
             disabled={isLoading}
-            className="mt-4 w-full bg-red-600 text-white py-2 rounded"
+            className="mt-4 w-full cursor-pointer bg-red-600 text-white py-2 rounded"
           >
             PUNCH OUT
           </button>

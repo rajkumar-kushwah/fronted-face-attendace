@@ -43,13 +43,21 @@ export default function FaceCamera({ onCapture, disabled }) {
 
   return (
     <div>
-      <video ref={videoRef} autoPlay muted className="rounded-lg w-full" />
+      {/* <video ref={videoRef} autoPlay muted className="rounded-lg w-full" /> */}
+      <div className="relative w-full h-[80vh]">
+        <video
+          ref={videoRef}
+          autoPlay
+          muted
+          className="absolute top-0 left-0 w-full h-full object-cover"
+        />
+      </div>
+
       <button
         onClick={handlePunchInClick}
         disabled={disabled}
-        className={`mt-2 w-full py-2 rounded text-white ${
-          disabled ? "bg-gray-400 cursor-not-allowed" : "bg-green-600"
-        }`}
+        className={`mt-2 w-full py-2 cursor-pointer rounded text-white ${disabled ? "bg-gray-400 cursor-not-allowed" : "bg-green-600"
+          }`}
       >
         Punch In
       </button>

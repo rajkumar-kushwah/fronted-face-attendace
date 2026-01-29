@@ -118,16 +118,6 @@ export default function Sidebar({ isOpen, toggle }) {
           </NavLink>
 
           <NavLink
-            to="/worksechudel"
-            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition ${isActive(
-              "/worksechudel"
-            )}`}
-          >
-            <Workflow className="w-4 h-4" />
-            <span>Work Schedule</span>
-          </NavLink>
-
-          <NavLink
             to="/attendance-page"
             className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition ${isActive(
               "/attendance-page"
