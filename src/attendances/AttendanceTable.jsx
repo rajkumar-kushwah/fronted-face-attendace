@@ -1,116 +1,104 @@
-import React from "react";
-import { FaTrash } from "react-icons/fa";
+import { useEffect, useState } from "react";
+import { getTodayAttendanceApi } from "../utils/api";
+import Layout from "../components/Layout";
 
-export default function AttendanceTable({
-  attendanceList,
-  loading,
-  onCheckIn,
-  onCheckOut,
-  onDelete,
-  onEdit,
-}) {
-  if (loading) return <p className="text-xs">Loading...</p>;
-  if (!attendanceList.length) return <p className="text-xs">No attendance records found.</p>;
+export default function AttendanceTable() {
+  const [data, setData] = useState([]);
 
-  // Format Date to 12-hour time
-  const formatTime12 = (time) => {
-    if (!time) return "-";
-    const dt = new Date(time);
-    return dt.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: true });
+  const fetchData = async () => {
+    try {
+      const res = await getTodayAttendanceApi("6972164941d0a468448c5f2c");
+      setData(res.data);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const formatDate = (date) => {
-    if (!date) return "-";
-    const dt = new Date(date);
-    return dt.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
-  };
-
-  // Convert decimal hours to hh:mm
-  const formatDecimalHours = (hoursDecimal) => {
-    if (hoursDecimal == null) return "-";
-    const h = Math.floor(hoursDecimal);
-    const m = Math.round((hoursDecimal - h) * 60);
-    return `${h}:${String(m).padStart(2, "0")}`;
-  };
+  useEffect(() => {
+    fetchData(); // initial fetch
+    const interval = setInterval(fetchData, 5000); // refresh every 5 sec
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <div className="w-full overflow-x-auto rounded-lg bg-transparent scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
-      <table className="w-full text-xs border border-gray-300 border-collapse min-w-[750px]">
-      <thead className="bg-gray-200 border-b border-gray-400">
+    <Layout>
+      <h2 className="text-2xl font-bold mb-6 text-center">Today's Attendance</h2>
 
-          <tr>
-            <th className="p-3 text-left">Employee</th>
-            <th className="p-3 text-center">Date</th>
-            <th className="p-3 text-center">In</th>
-            <th className="p-3 text-center">Out</th>
-            <th className="p-3 text-center">Status</th>
-            <th className="p-3 text-center">Total</th>
-            <th className="p-3 text-center">OverTime</th>
-            <th className="p-3 text-center">Actions</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {attendanceList.map((att) => (
-            <tr
-              key={att._id}
-              className=" hover:bg-gray-50/70 transition-all  border border-gray-300  text-[11px]"
-            >
-              <td className="p-2 flex items-center gap-2 flex-wrap">
-                <img
-                  src={att.employeeId?.avatar || "/default-avatar.png"}
-                  className="w-6 h-6 rounded-full border border-gray-300"
-                />
-                <div className="flex  flex-col leading-tight">
-                  <span className="text-[11px] font-medium">{att.employeeId?.name}</span>
-                  <span className="text-[10px] text-gray-500">{att.employeeId?.employeeCode || "-"}</span>
-                </div>
-              </td>
-
-              <td className="p-3 text-center border border-gray-300">{formatDate(att.date || att.checkIn)}</td>
-              <td className="p-3 text-center border border-gray-300">{formatTime12(att.checkIn)}</td>
-              <td className="p-3 text-center border border-gray-300">{formatTime12(att.checkOut)}</td>
-              <td className="p-3 text-center border border-gray-300">{att.status || "-"}</td>
-              <td className="p-3 text-center border border-gray-300">{formatDecimalHours(att.totalHours)}</td>
-              <td className="p-3 text-center border border-gray-300">{formatDecimalHours(att.overtimeHours)}</td>
-
-              <td className="p-3 flex gap-1 justify-center flex-wrap">
-                {!att.checkIn && (
-                  <button
-                    className="bg-lime-400 hover:bg-lime-500 text-white cursor-pointer px-2 py-1 rounded text-[10px] shadow-sm"
-                    onClick={() => onCheckIn(att.employeeId?._id)}
-                  >
-                    Check In
-                  </button>
-                )}
-
-                {att.checkIn && !att.checkOut && (
-                  <button
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 cursor-pointer rounded text-[10px] shadow-sm"
-                    onClick={() => onCheckOut(att.employeeId?._id)}
-                  >
-                    Check Out
-                  </button>
-                )}
-
-                <button
-                  className="bg-yellow-400 hover:bg-yellow-500 text-white px-2 cursor-pointer py-1 rounded text-[10px] shadow-sm"
-                  onClick={() => onEdit(att)}
-                >
-                  Edit
-                </button>
-
-                <button
-                  className="bg-red-500 hover:bg-red-600 text-white p-1 cursor-pointer rounded text-[10px] shadow-sm flex items-center justify-center"
-                  onClick={() => onDelete(att._id)}
-                >
-                  <FaTrash size={10} />
-                </button>
-              </td>
+      <div className="overflow-x-auto">
+        <table className="min-w-full border border-gray-300 shadow-md rounded-lg overflow-hidden text-center">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="px-3 py-2 text-left text-xs">Code</th>
+              <th className="px-3 py-2 text-left text-xs">Employee</th>
+              <th className="px-3 py-2 text-left text-xs">In Time</th>
+              <th className="px-3 py-2 text-left text-xs">Out Time</th>
+              <th className="px-3 py-2 text-left text-xs">Status</th>
+              <th className="px-3 py-2 text-left text-xs">Late (min)</th>
+              <th className="px-3 py-2 text-left text-xs">Early (min)</th>
+              <th className="px-3 py-2 text-left text-xs">Working (min)</th>
+              <th className="px-3 py-2 text-left text-xs">In Location</th>
+              <th className="px-3 py-2 text-left text-xs">Out Location</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody className="bg-gray-100">
+            {data.map(row => (
+              <tr key={row._id} className="hover:bg-gray-50 border-b">
+
+                {/* Employee Code */}
+                <td className="px-3 py-2 text-xs font-medium text-gray-700">{row.employeeCode}</td>
+
+                {/* Employee Name + Photo */}
+                <td className="px-3 py-2 flex items-center space-x-2 text-xs">
+                  {row.faceImage ? (
+                    <img
+                      src={row.faceImage}
+                      alt={row.employeeName}
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
+                  )}
+                  <span className="font-semibold text-gray-800">{row.employeeName}</span>
+                </td>
+
+                {/* In Time */}
+                <td className="px-3 py-2 text-xs text-gray-700">
+                  {row.inTime ? new Date(row.inTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "-"}
+                </td>
+
+                {/* Out Time */}
+                <td className="px-3 py-2 text-xs text-gray-700">
+                  {row.outTime ? new Date(row.outTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "-"}
+                </td>
+
+                {/* Status */}
+                <td className={`px-3 py-2 text-xs font-semibold ${
+                  row.status === "PRESENT" ? "text-green-600" :
+                  row.status === "HALF" ? "text-yellow-500" :
+                  "text-red-500"
+                }`}>
+                  {row.status}
+                </td>
+
+                {/* Late Minutes */}
+                <td className="px-3 py-2 text-xs text-gray-700">{row.lateMinutes ?? 0}</td>
+
+                {/* Early Minutes */}
+                <td className="px-3 py-2 text-xs text-gray-700">{row.earlyMinutes ?? 0}</td>
+
+                {/* Working Minutes */}
+                <td className="px-3 py-2 text-xs text-gray-700">{row.workingMinutes ?? 0}</td>
+
+                {/* In Location */}
+                <td className="px-3 py-2 text-xs text-gray-700">{row.inLocation ?? "-"}</td>
+
+                {/* Out Location */}
+                <td className="px-3 py-2 text-xs text-gray-700">{row.outLocation ?? "-"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Layout>
   );
 }
