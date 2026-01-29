@@ -1,76 +1,66 @@
-// src/faceAttendance/FaceCamera.jsx
-import { useEffect, useRef, useState } from "react";
-import { faceScanAttendance } from "../utils/api";
+import { useEffect, useRef } from "react";
 
-export default function FaceCamera({ onResult, status }) {
+export default function FaceCamera({ onCapture, disabled }) {
   const videoRef = useRef(null);
-  const canvasRef = useRef(null);
-  const [scanning, setScanning] = useState(false);
+  const streamRef = useRef(null); // 👈 stream store karenge
 
   useEffect(() => {
+    const startCamera = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: true
+        });
+
+        streamRef.current = stream;          // 👈 save stream
+        videoRef.current.srcObject = stream;
+      } catch (err) {
+        alert("Camera permission denied");
+        console.error(err);
+      }
+    };
+
     startCamera();
-    return () => stopCamera();
+
+    // 🔴 CLEANUP: page / component change hote hi camera STOP
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+        streamRef.current = null;
+      }
+    };
   }, []);
 
-  const startCamera = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
+  const handlePunchInClick = () => {
+    if (disabled) return;
 
-        // Start scanning only after video is ready
-        requestAnimationFrame(scanFace); 
-      }
-    } catch (err) {
-      console.error("Camera error:", err);
-    }
-  };
-
-  const stopCamera = () => {
-    const stream = videoRef.current?.srcObject;
-    if (stream) stream.getTracks().forEach(track => track.stop());
-  };
-
-  const scanFace = async () => {
-    if (!videoRef.current || scanning) return;
-
-    const canvas = canvasRef.current;
-    const video = videoRef.current;
-    if (!canvas) return;
-
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+    const canvas = document.createElement("canvas");
+    canvas.width = videoRef.current.videoWidth;
+    canvas.height = videoRef.current.videoHeight;
 
     const ctx = canvas.getContext("2d");
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    const imageBase64 = canvas.toDataURL("image/jpeg");
+    ctx.drawImage(videoRef.current, 0, 0);
 
-    try {
-      setScanning(true); // prevent overlap
-      const res = await faceScanAttendance(imageBase64);
-      onResult(res);
-    } catch (err) {
-      console.error("Scan failed:", err);
-      onResult({ success: false });
-    } finally {
-      setScanning(false);
-      requestAnimationFrame(scanFace); // continue scanning
-    }
+    const imageBase64 = canvas.toDataURL("image/jpeg");
+    onCapture(imageBase64);
   };
 
-  // BORDER COLOR
-  const borderColor =
-    status === "success"
-      ? "border-green-500"
-      : status === "failed"
-      ? "border-red-500"
-      : "border-gray-300";
-
   return (
-    <div className={`w-80 h-60 border-4 ${borderColor} rounded-lg overflow-hidden`}>
-      <video ref={videoRef} className="w-full h-full object-cover" muted />
-      <canvas ref={canvasRef} className="hidden" />
+    <div>
+      <video
+        ref={videoRef}
+        autoPlay
+        muted
+        className="rounded-lg w-full"
+      />
+
+      <button
+        onClick={handlePunchInClick}
+        disabled={disabled}
+        className={`mt-2 w-full py-2 rounded text-white
+          ${disabled ? "bg-gray-400" : "bg-green-600"}`}
+      >
+        Punch In
+      </button>
     </div>
   );
 }

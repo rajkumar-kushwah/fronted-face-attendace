@@ -1,69 +1,82 @@
-// src/faceAttendance/AttendanceScan.jsx
 import { useState } from "react";
-import FaceCamera from "./FaceCamera";
+import FaceCamera from "../faceAttendance/FaceCamera";
+import EmployeePreview from "../faceAttendance/EmployeePreview";
+import {
+  verifyFaceApi,
+  punchInApi,
+  punchOutApi
+} from "../utils/api";
 import Layout from "../components/Layout";
+
 export default function AttendanceScan() {
-    const [scanResult, setScanResult] = useState(null);
-    const [status, setStatus] = useState("scanning");
-    // scanning | success | failed
+  const [employee, setEmployee] = useState(null);
+  const [status, setStatus] = useState(null); // null | IN
 
-    return (
-        <Layout>
-            <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
+  // Punch In button click → camera capture yahin hota hai
+  const handlePunchInCapture = async (imageBase64) => {
+    try {
+      //  Verify face
+      const res = await verifyFaceApi({
+        companyId: "6972164941d0a468448c5f2c",
+        image: imageBase64
+      });
 
-                <h1 className="text-2xl font-bold mb-4">
-                    Face Attendance
-                </h1>
+      const emp = res.data.employee;
+      setEmployee(emp);
 
-                {/* CAMERA */}
-                <FaceCamera
-                    onResult={(result) => {
-                        if (result.success) {
-                            setScanResult(result);
-                            setStatus("success");
-                        } else {
-                            setScanResult(null);
-                            setStatus("failed");
-                        }
-                    }}
-                    status={status}
-                />
+      //  Punch In
+      await punchInApi({
+        companyId: "6972164941d0a468448c5f2c",
+        employeeId: emp.id,
+        location: "Connaught Place, Delhi"
+      });
 
-                {/* RESULT CARD */}
-                <div className="mt-6 w-full max-w-md bg-white rounded-lg shadow p-4">
-                    {status === "scanning" && (
-                        <p className="text-center text-gray-500">
-                            Scanning face...
-                        </p>
-                    )}
+      setStatus("IN");
+    } catch (err) {
+      alert("Face not matched / Punch In failed");
+      console.error(err);
+    }
+  };
 
-                    {status === "failed" && (
-                        <p className="text-center text-red-500 font-semibold">
-                            Face not recognized
-                        </p>
-                    )}
+  const punchOut = async () => {
+    try {
+      await punchOutApi({
+        companyId: "6972164941d0a468448c5f2c",
+        employeeId: employee._id,
+        location: "Connaught Place, Delhi"
+      });
 
-                    {status === "success" && scanResult && (
-                        <div className="space-y-3 text-center">
-                            <p><b>Name:</b> {scanResult.name}</p>
-                            <p><b>Employee Code:</b> {scanResult.employeeCode}</p>
-                            <button
-                                onClick={() => handlePunchIn(scanResult._id)}
-                                className="bg-green-500 text-white px-4 py-2 rounded"
-                            >
-                                Punch In
-                            </button>
-                            <button
-                                onClick={() => handlePunchOut(scanResult._id)}
-                                className="bg-blue-500 text-white px-4 py-2 rounded"
-                            >
-                                Punch Out
-                            </button>
-                        </div>
-                    )}
+      // reset for next employee
+      setEmployee(null);
+      setStatus(null);
+    } catch (err) {
+      alert("Punch Out failed");
+    }
+  };
 
-                </div>
-            </div>
-        </Layout>
-    );
+  return (
+    <Layout>
+      <div className="p-6 max-w-xl mx-auto">
+
+        {/* ONE CAMERA ONLY */}
+        <FaceCamera
+          onCapture={handlePunchInCapture}
+          disabled={status === "IN"}
+        />
+
+        {/* Live employee preview */}
+        <EmployeePreview employee={employee} />
+
+        {/* Punch Out */}
+        {employee && status === "IN" && (
+          <button
+            onClick={punchOut}
+            className="mt-4 w-full bg-red-600 text-white py-2 rounded"
+          >
+            PUNCH OUT
+          </button>
+        )}
+      </div>
+    </Layout>
+  );
 }

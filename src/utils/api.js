@@ -171,15 +171,18 @@ export const deleteAttendance = async (id) => {
   return res.data;
 };
 
-// -----------------------------
-// ATTENDANCE – FACE SCAN
-// -----------------------------
-export const faceScanAttendance = async (imageBase64) => {
-  const res = await api.post("/attendance/face-scan", {
-    image: imageBase64,
-  });
-  return res.data;
-};
+export const verifyFaceApi = (data) =>
+  api.post("/attendance/verify-face", data);
+
+export const punchInApi = (data) =>
+  api.post("/attendance/punch-in", data);
+
+export const punchOutApi = (data) =>
+  api.post("/attendance/punch-out", data);
+
+export const getTodayAttendanceApi = (companyId) =>
+  api.get(`/attendance/today/${companyId}`);
+
 
 // leave APIs
 // Client
