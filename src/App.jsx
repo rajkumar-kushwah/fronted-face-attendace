@@ -20,7 +20,7 @@ import NotFound from "./notfound/NotFound";
 import EditEmployee from "./employees/EditEmployee";
 import AdminList from './admin/AdminManagment';
 import AddUser from './admin/UserList';
-import AttendanceTeble from './attendances/AttendanceTable';
+import AttendancePage from './attendances/AttendancePage';
 import LeaveMainPage from './leaves/LeaveMainPage';
 import PayrollPage from './payroll/PayrollPage';
 import SecondCounter from './seconds/Second';
@@ -59,11 +59,12 @@ function App() {
         <Route path="/settings" element={<ProtectedRoute allowedRoles={["owner"]}><Settings/></ProtectedRoute>} />
         <Route path="/admin" element={<ProtectedRoute><AdminList /></ProtectedRoute>} />
         <Route path='/admin/add-user' element={<ProtectedRoute><AddUser /></ProtectedRoute>} />
-        <Route path="/attendance-page" element={<ProtectedRoute><AttendanceTeble /></ProtectedRoute>} />
+        <Route path="/attendance-page" element={<ProtectedRoute><AttendancePage /></ProtectedRoute>} />
         <Route path="/leave"  element={<ProtectedRoute><LeaveMainPage /></ProtectedRoute>}/>
         <Route path="/payroll" element={<ProtectedRoute><PayrollPage/></ProtectedRoute>} />
         <Route path='/second' element={<ProtectedRoute><SecondCounter /></ProtectedRoute>}/>
         <Route path='/game' element={<ProtectedRoute><Pro /></ProtectedRoute>}/>
+        
         {/* protected route end */}
       </Routes>
     </Router>

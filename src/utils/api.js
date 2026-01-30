@@ -183,6 +183,11 @@ export const punchOutApi = (data) =>
 export const getTodayAttendanceApi = (companyId) =>
   api.get(`/attendance/today/${companyId}`);
 
+export const getFilteredAttendanceApi = (params) =>
+  api.get("/attendance/filter", { params });
+
+export const getAttendanceListApi = (companyId, page = 1, limit = 20) => 
+  api.get(`/attendance/list?companyId=${companyId}&page=${page}&limit=${limit}`);
 
 // leave APIs
 // Client
