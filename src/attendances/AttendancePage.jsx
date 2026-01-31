@@ -14,20 +14,22 @@ export default function AttendancePage() {
 
   // page load pe aaj + kal ka data
   const loadInitialData = async () => {
-    const today = new Date();
-    const yesterday = new Date();
-    yesterday.setDate(today.getDate() - 1);
+  const today = new Date();
+  const fromDate = new Date(today.getFullYear() - 10, 0, 1)
+    .toISOString()
+    .split("T")[0];
 
-    const fromDate = yesterday.toISOString().split("T")[0];
-    const toDate = today.toISOString().split("T")[0];
-    
-    const res = await getFilteredAttendanceApi({
-      companyId,
-      fromDate,
-      toDate,
-    });
-    setData(res.data.data);
-  }
+  const toDate = today.toISOString().split("T")[0];
+
+  const res = await getFilteredAttendanceApi({
+    companyId,
+    fromDate,
+    toDate,
+  });
+
+  setData(res.data.data);
+};
+
 
   // default = today
   // const loadToday = async () => {
