@@ -65,7 +65,7 @@ export default function AttendanceFilter({ onFilter }) {
 
         {statusOpen && (
           <ul className="absolute left-0 right-0 bg-white border mt-1 rounded shadow z-10 text-xs">
-            {["", "Present", "Half", "Absent"].map((status) => (
+            {["", "PRESENT", "HALF", "ABSENT"].map((status) => (
               <li
                 key={status}
                 className="px-2 py-1 hover:bg-gray-100 cursor-pointer"
