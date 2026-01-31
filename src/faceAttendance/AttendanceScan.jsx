@@ -3,6 +3,7 @@ import FaceCamera from "../faceAttendance/FaceCamera";
 import EmployeePreview from "../faceAttendance/EmployeePreview";
 import { verifyFaceApi, punchInApi, punchOutApi } from "../utils/api";
 import Layout from "../components/Layout";
+import { getCurrentLocation } from "../utils/getLocation";
 
 export default function AttendanceScan() {
   const [employee, setEmployee] = useState(null);
@@ -48,62 +49,68 @@ export default function AttendanceScan() {
   };
 
   // Manual Punch IN
-  const handlePunchIn = async () => {
-    if (!employee || isLoading) return;
-    setIsLoading(true);
+const handlePunchIn = async () => {
+  if (!employee || isLoading) return;
+  setIsLoading(true);
 
-    try {
-      await punchInApi({
-        companyId: "6972164941d0a468448c5f2c",
-        employeeId: employee.id,
-        location: "Connaught Place, Delhi"
-      });
+  try {
+    const location = await getCurrentLocation();
 
-      setEmployee((prev) => ({ ...prev, attendanceStatus: "IN" }));
-      setSuccessMessage(" Punch IN Successful");
+    await punchInApi({
+      companyId: "6972164941d0a468448c5f2c",
+      employeeId: employee.id,
+      latitude: location.latitude,
+      longitude: location.longitude
+    });
 
-      // Clear after 3 seconds
-      setTimeout(() => {
-        setEmployee(null);
-        setSuccessMessage("");
-        setCameraKey(Date.now());
-      }, 3000);
+    setEmployee((prev) => ({ ...prev, attendanceStatus: "IN" }));
+    setSuccessMessage("Punch IN Successful");
 
-    } catch (err) {
-      alert("Punch IN failed");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    setTimeout(() => {
+      setEmployee(null);
+      setSuccessMessage("");
+      setCameraKey(Date.now());
+      setIsLoading(false);   // 👈 yahan
+    }, 3000);
+
+  } catch (err) {
+    alert("Location permission is required to Punch IN");
+    setIsLoading(false);
+  }
+};
+
 
   // Punch OUT
-  const handlePunchOut = async () => {
-    if (!employee || isLoading) return;
-    setIsLoading(true);
+ const handlePunchOut = async () => {
+  if (!employee || isLoading) return;
+  setIsLoading(true);
 
-    try {
-      await punchOutApi({
-        companyId: "6972164941d0a468448c5f2c",
-        employeeId: employee.id,
-        location: "Connaught Place, Delhi"
-      });
+  try {
+    const location = await getCurrentLocation();
 
-      setEmployee((prev) => ({ ...prev, attendanceStatus: "OUT" }));
-      setSuccessMessage(" Punch OUT Successful");
+    await punchOutApi({
+      companyId: "6972164941d0a468448c5f2c",
+      employeeId: employee.id,
+      latitude: location.latitude,
+      longitude: location.longitude
+    });
 
-      // Clear after 3 seconds
-      setTimeout(() => {
-        setEmployee(null);
-        setSuccessMessage("");
-        setCameraKey(Date.now());
-      }, 3000);
+    setEmployee((prev) => ({ ...prev, attendanceStatus: "OUT" }));
+    setSuccessMessage("Punch OUT Successful");
 
-    } catch (err) {
-      alert("Punch OUT failed");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    setTimeout(() => {
+      setEmployee(null);
+      setSuccessMessage("");
+      setCameraKey(Date.now());
+      setIsLoading(false);   // 👈 yahan
+    }, 3000);
+
+  } catch (err) {
+    alert("Location permission is required to Punch OUT");
+    setIsLoading(false);
+  }
+};
+
 
   return (
     <Layout>

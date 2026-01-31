@@ -92,8 +92,8 @@ export default function AttendanceTable({ data }) {
               <td className="px-2 py-1">{row.workingMinutes ?? 0}</td>
 
               {/* Locations */}
-              <td className="px-2 py-1">{row.inLocation ?? "-"}</td>
-              <td className="px-2 py-1">{row.outLocation ?? "-"}</td>
+              <td className="px-2 py-1">{row.inLocation?.address ??  "-"}</td>
+              <td className="px-2 py-1">{row.outLocation?.address ?? "-"}</td>
 
             </tr>
           ))}
