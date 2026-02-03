@@ -76,10 +76,7 @@ export const toggleUser = (userId,newRole) =>
 export const deleteUser = (userId) =>
   api.delete(`/company/user/${userId}`);
 
-export const getWorkSchedules = async () => {
-  const res = await api.get("/workSchedule"); // fix typo
-  return res.data;
-};
+
  
 // 🔹 Fetch only employees (non-admin)
 export const getEmployeesForAdminPromotion = () =>
@@ -92,85 +89,7 @@ export const promoteEmployeeToAdmin = (employeeId) =>
 
 
 
-
-export const addWorkSchedule = async (data) => {
-  const res = await api.post("/workSchedule/add", data);
-  return res.data;
-};
-
-export const updateWorkSchedule = async (id, data) => {
-  const res = await api.put(`/workSchedule/${id}`, data);
-  return res.data;
-};
-
-export const deleteWorkSchedule = async (id) => {
-  const res = await api.delete(`/workSchedule/${id}`);
-  return res.data;
-};
-
-
-
-// 1) Check-In (Admin/Owner can provide employeeId)
-
-export const checkIn = async (employeeId) => {
-  const res = await api.post("/attendance/check-in", { employeeId });
-  return res.data;
-};
-
-
-// 2) Check-Out (Admin/Owner can provide employeeId)
-
-export const checkOut = async (employeeId) => {
-  const res = await api.post("/attendance/check-out", { employeeId });
-  return res.data;
-};
-
-
-// 3) Get All Attendance (Admin/Owner only)
-// filters = { employeeId, status, startDate, endDate, month, year, page, limit }
-
-export const getAttendance = async (filters = {}) => {
-  const res = await api.get("/attendance", { params: filters });
-  return res.data;
-};
-
-
-
-// 4) Filter Attendance (Advanced search)
-// filters = { employeeName, employeeCode, department, role, status, startDate,  page, limit }
-
-// Filter attendance (Advanced search)
-export const filterAttendance = async (filters = {}) => {
-  const res = await api.get("/attendance", { params: filters });
-  return res.data;
-};
-
-
-// 5) Add Attendance manually (Admin/Owner)
-// data = { employeeId, date, status, checkIn, checkOut, remarks }
-
-export const addAttendance = async (data) => {
-  const res = await api.post("/attendance/add", data);
-  return res.data;
-};
-
-
-// 6) Update Attendance (Admin/Owner)
-// data = { date, status, checkIn, checkOut, remarks }
-
-export const updateAttendance = async (id, data) => {
-  const res = await api.put(`/attendance/${id}`, data);
-  return res.data;
-};
-
-
-// 7) Delete Attendance (Admin/Owner)
-
-export const deleteAttendance = async (id) => {
-  const res = await api.delete(`/attendance/${id}`);
-  return res.data;
-};
-
+// Attendance APIs
 export const verifyFaceApi = (data) =>
   api.post("/attendance/verify-face", data);
 
@@ -188,6 +107,21 @@ export const getFilteredAttendanceApi = (params) =>
 
 export const getAttendanceListApi = (companyId, page = 1, limit = 20) => 
   api.get(`/attendance/list?companyId=${companyId}&page=${page}&limit=${limit}`);
+
+// GET all employees for a company
+export const getEmployeesApi = (companyId) =>
+  api.get("/attendance", { params: { companyId } });
+
+
+// GET attendance for a specific employee
+export const getEmployeeAttendanceApi = (employeeId) =>
+  api.get(`/attendance/employee/${employeeId}`);
+
+export const deleteAttendanceApi = (employeeId, date, companyId) => {
+  return api.delete(`/attendance/${employeeId}/${date}`, {
+    params: { companyId }
+  });
+};
 
 // leave APIs
 // Client

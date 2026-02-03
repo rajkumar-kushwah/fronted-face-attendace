@@ -29,6 +29,8 @@ import Pro from './basics/Filternet';
 import FaceScan from './employees/FaceScan';
 import { FaceProvider } from "./context/FaceContext";
 import AttendanceScan from './faceAttendance/AttendanceScan';
+import EmployeeAttendancePage from './attendances/EmployeeAttendancePage';
+
 function App() {
   return (
     <FaceProvider>
@@ -60,6 +62,7 @@ function App() {
         <Route path="/admin" element={<ProtectedRoute><AdminList /></ProtectedRoute>} />
         <Route path='/admin/add-user' element={<ProtectedRoute><AddUser /></ProtectedRoute>} />
         <Route path="/attendance-page" element={<ProtectedRoute><AttendancePage /></ProtectedRoute>} />
+        <Route path="/attendance/:employeeId" element={<ProtectedRoute><EmployeeAttendancePage /></ProtectedRoute>} />
         <Route path="/leave"  element={<ProtectedRoute><LeaveMainPage /></ProtectedRoute>}/>
         <Route path="/payroll" element={<ProtectedRoute><PayrollPage/></ProtectedRoute>} />
         <Route path='/second' element={<ProtectedRoute><SecondCounter /></ProtectedRoute>}/>

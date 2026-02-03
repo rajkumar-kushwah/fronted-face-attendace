@@ -23,6 +23,9 @@ export default function Sidebar({ isOpen, toggle }) {
       ? "bg-lime-300 text-gray-900 font-medium shadow-sm"
       : "text-gray-700 hover:bg-lime-200";
 
+  const attendanceActive =
+    location.pathname.startsWith("/attendance")
+
   return (
     <aside
       aria-hidden={!isOpen}
@@ -80,7 +83,7 @@ export default function Sidebar({ isOpen, toggle }) {
           <p className="text-xs text-gray-500">
             {user?.role
               ? user.role.charAt(0).toUpperCase() +
-                user.role.slice(1)
+              user.role.slice(1)
               : "No role"}
           </p>
         </div>
@@ -117,11 +120,20 @@ export default function Sidebar({ isOpen, toggle }) {
             <span>Employees</span>
           </NavLink>
 
-          <NavLink
+          {/* <NavLink
             to="/attendance-page"
             className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition ${isActive(
               "/attendance-page"
             )}`}
+          >
+            <ClipboardList className="w-4 h-4" />
+            <span>Attendance</span>
+          </NavLink> */}
+
+          <NavLink
+            to="/attendance-page"
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition ${attendanceActive ? "bg-blue-100 text-blue-600" : "text-gray-700"
+              }`}
           >
             <ClipboardList className="w-4 h-4" />
             <span>Attendance</span>

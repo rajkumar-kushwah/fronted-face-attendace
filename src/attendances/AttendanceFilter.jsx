@@ -82,7 +82,7 @@ export default function AttendanceFilter({ onFilter }) {
         {/* Apply Button */}
       <button
         onClick={applyFilter}
-        className="bg-blue-600 text-white px-4 py-1 rounded text-xs"
+        className="bg-blue-600 text-white cursor-pointer px-4 py-1 rounded text-xs"
       >
         Apply
       </button>
