@@ -1,32 +1,5 @@
 
 
-// export const getCurrentLocation = () => {
-//   return new Promise((resolve, reject) => {
-//     if (!navigator.geolocation) {
-//       return reject("Geolocation not supported");
-//     }
-
-//     navigator.geolocation.getCurrentPosition(
-//       (pos) => {
-//         resolve({
-//           latitude: pos.coords.latitude,
-//           longitude: pos.coords.longitude,
-//           accuracy: pos.coords.accuracy
-//         });
-//       },
-//       (err) => {
-//         reject("Location permission denied");
-//       },
-//       {
-//         enableHighAccuracy: true,
-//         timeout: 10000
-//       }
-//     );
-//   });
-// };
-
-
-// src/utils/getCurrentLocation.js
 export const getCurrentLocation = () => {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
@@ -41,13 +14,13 @@ export const getCurrentLocation = () => {
           accuracy: pos.coords.accuracy
         });
       },
-      () => reject("Location permission denied"),
+      (err) => {
+        reject("Location permission denied");
+      },
       {
         enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 0
+        timeout: 10000
       }
     );
   });
 };
-
