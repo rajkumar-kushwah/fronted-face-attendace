@@ -132,7 +132,7 @@ export default function Sidebar({ isOpen, toggle }) {
 
           <NavLink
             to="/attendance-page"
-            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition ${attendanceActive ? "bg-blue-100 text-blue-600" : "text-gray-700"
+            className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition ${attendanceActive ? " hover:bg-lime-200 bg-lime-300" : "text-gray-700"
               }`}
           >
             <ClipboardList className="w-4 h-4" />
