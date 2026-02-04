@@ -5,6 +5,7 @@ import { verifyFaceApi, punchInApi, punchOutApi } from "../utils/api";
 import Layout from "../components/Layout";
 import { getCurrentLocation } from "../utils/getLocation";
 
+
 export default function AttendanceScan() {
   const [employee, setEmployee] = useState(null);
   const [isLoading, setIsLoading] = useState(false); // verification / punch animation
@@ -49,6 +50,35 @@ export default function AttendanceScan() {
   };
 
   // Manual Punch IN
+// const handlePunchIn = async () => {
+//   if (!employee || isLoading) return;
+//   setIsLoading(true);
+
+//   try {
+//     const location = await getCurrentLocation();
+
+//     await punchInApi({
+//       companyId: "6972164941d0a468448c5f2c",
+//       employeeId: employee.id,
+//       latitude: location.latitude,
+//       longitude: location.longitude
+//     });
+
+//     setEmployee((prev) => ({ ...prev, attendanceStatus: "IN" }));
+//     setSuccessMessage("Punch IN Successful");
+
+//     setTimeout(() => {
+//       setEmployee(null);
+//       setSuccessMessage("");
+//       setCameraKey(Date.now());
+//       setIsLoading(false);   // 👈 yahan
+//     }, 3000);
+
+//   } catch (err) {
+//     alert("Location permission is required to Punch IN");
+//     setIsLoading(false);
+//   }
+// };
 const handlePunchIn = async () => {
   if (!employee || isLoading) return;
   setIsLoading(true);
@@ -60,7 +90,8 @@ const handlePunchIn = async () => {
       companyId: "6972164941d0a468448c5f2c",
       employeeId: employee.id,
       latitude: location.latitude,
-      longitude: location.longitude
+      longitude: location.longitude,
+      accuracy: location.accuracy   //  VERY IMPORTANT
     });
 
     setEmployee((prev) => ({ ...prev, attendanceStatus: "IN" }));
@@ -70,18 +101,49 @@ const handlePunchIn = async () => {
       setEmployee(null);
       setSuccessMessage("");
       setCameraKey(Date.now());
-      setIsLoading(false);   // 👈 yahan
+      setIsLoading(false);
     }, 3000);
 
   } catch (err) {
-    alert("Location permission is required to Punch IN");
+    alert(err || "Unable to Punch IN. Please retry");
     setIsLoading(false);
   }
 };
 
 
+
   // Punch OUT
- const handlePunchOut = async () => {
+//  const handlePunchOut = async () => {
+//   if (!employee || isLoading) return;
+//   setIsLoading(true);
+
+//   try {
+//     const location = await getCurrentLocation();
+
+//     await punchOutApi({
+//       companyId: "6972164941d0a468448c5f2c",
+//       employeeId: employee.id,
+//       latitude: location.latitude,
+//       longitude: location.longitude
+//     });
+
+//     setEmployee((prev) => ({ ...prev, attendanceStatus: "OUT" }));
+//     setSuccessMessage("Punch OUT Successful");
+
+//     setTimeout(() => {
+//       setEmployee(null);
+//       setSuccessMessage("");
+//       setCameraKey(Date.now());
+//       setIsLoading(false);   // 👈 yahan
+//     }, 3000);
+
+//   } catch (err) {
+//     alert("Location permission is required to Punch OUT");
+//     setIsLoading(false);
+//   }
+// };
+
+const handlePunchOut = async () => {
   if (!employee || isLoading) return;
   setIsLoading(true);
 
@@ -92,7 +154,8 @@ const handlePunchIn = async () => {
       companyId: "6972164941d0a468448c5f2c",
       employeeId: employee.id,
       latitude: location.latitude,
-      longitude: location.longitude
+      longitude: location.longitude,
+      accuracy: location.accuracy   //  VERY IMPORTANT
     });
 
     setEmployee((prev) => ({ ...prev, attendanceStatus: "OUT" }));
@@ -102,11 +165,11 @@ const handlePunchIn = async () => {
       setEmployee(null);
       setSuccessMessage("");
       setCameraKey(Date.now());
-      setIsLoading(false);   // 👈 yahan
+      setIsLoading(false);
     }, 3000);
 
   } catch (err) {
-    alert("Location permission is required to Punch OUT");
+    alert(err || "Unable to Punch OUT. Please retry");
     setIsLoading(false);
   }
 };

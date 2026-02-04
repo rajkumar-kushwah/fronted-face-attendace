@@ -20,7 +20,7 @@ export default function AttendanceTable({data, handleDelete}) {
             <th className="px-2 py-1 border-r border-gray-300">Working</th>
             <th className="px-2 py-1 border-r border-gray-300">In Location</th>
             <th className="px-2 py-1 border-r border-gray-300">Out Location</th>
-            <th className="px-2 py-1 border-r border-gray-300">Action</th>
+            {/* <th className="px-2 py-1 border-r border-gray-300">Action</th> */}
           </tr>
         </thead>
 
@@ -98,12 +98,12 @@ export default function AttendanceTable({data, handleDelete}) {
               {/* Locations */}
               <td className="px-2 py-1 border-r border-gray-300">{row.inLocation?.address ??  "-"}</td>
               <td className="px-2 py-1 border-r border-gray-300">{row.outLocation?.address ?? "-"}</td>
-                  <td className="px-2 py-1 border-r border-gray-300">
+                  {/* <td className="px-2 py-1 border-r border-gray-300">
                   <button
                   className="bg-red-500 text-white cursor-pointer px-2 py-1 rounded-md"
                   onClick={() => handleDelete(row.employeeId, new Date(row.date).toISOString().split('t')[0])}
                   >Delete</button>
-                  </td>
+                  </td> */}
             </tr>
           ))}
         </tbody>
